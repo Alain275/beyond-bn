@@ -9,7 +9,41 @@ function createApp() {
   const app = express();
   const port = process.env.PORT || 4000;
 
-  app.use(cors());
+  const allowedOrigins = (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  const defaultOrigins = [
+    "http://localhost:5173",
+    "https://beyond-bn.onrender.com/",
+    "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+  ];
+
+  const originAllowlist = new Set([...defaultOrigins, ...allowedOrigins]);
+
+  const corsOptions = {
+    origin(origin, callback) {
+      // Allow non-browser requests and same-origin requests with no Origin header.
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (originAllowlist.has(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false,
+  };
+
+  app.use(cors(corsOptions));
+  app.options("*", cors(corsOptions));
   app.use(express.json());
 
   app.get("/health", (_req, res) => {

@@ -16,7 +16,7 @@ npm install
 npm run dev
 ```
 
-The server runs on `http://localhost:4000` by default.
+The server runs on `https://beyond-bn.onrender.com` by default.
 
 ## Seeded accounts
 
@@ -25,4 +25,4 @@ The server runs on `http://localhost:4000` by default.
 
 ## Swagger
 
-Open `http://localhost:4000/api-docs` after starting the server.
+Open `https://beyond-bn.onrender.com/api-docs` after starting the server.
