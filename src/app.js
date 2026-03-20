@@ -16,8 +16,8 @@ function createApp() {
 
   const defaultOrigins = [
     "http://localhost:5173",
-    "https://beyond-bn.onrender.com/",
-    "https://beyondthehorizon-npc.netlify.app/",
+    "https://beyond-bn.onrender.com",
+    "https://beyondthehorizon-npc.netlify.app",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
