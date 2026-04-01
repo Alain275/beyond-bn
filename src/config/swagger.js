@@ -24,6 +24,10 @@ function createSwaggerSpec(port) {
         name: "Activities",
         description: "Activity management for the platform",
       },
+      {
+        name: "Debates",
+        description: "Debate management for the platform",
+      },
     ],
     components: {
       securitySchemes: {
@@ -133,6 +137,36 @@ function createSwaggerSpec(port) {
             description: { type: "string", example: "Participate in structured debates on diverse topics..." },
             status: { type: "string", enum: ["active", "inactive"], example: "active" },
             image: { type: "string", example: "https://unsplash.com/photo" },
+          }
+        },
+        Debate: {
+          type: "object",
+          properties: {
+            id: { type: "integer", example: 1 },
+            motion: { type: "string", example: "This House Believes..." },
+            category: { type: "string", example: "Technology" },
+            status: { type: "string", enum: ["Open", "In Progress", "Completed", "Upcoming"], example: "Open" },
+            date: { type: "string", example: "2026-03-20" },
+            rounds: { type: "integer", example: 4 },
+            points: { type: "integer", example: 300 },
+            maxTeamSize: { type: "integer", example: 3 },
+            judges: { type: "string", example: "Dr. Jean" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          }
+        },
+        DebateRequest: {
+          type: "object",
+          required: ["motion", "category", "date"],
+          properties: {
+            motion: { type: "string", example: "This House Believes..." },
+            category: { type: "string", example: "Technology" },
+            status: { type: "string", enum: ["Open", "In Progress", "Completed", "Upcoming"], example: "Open" },
+            date: { type: "string", example: "2026-03-20" },
+            rounds: { type: "integer", example: 4 },
+            points: { type: "integer", example: 300 },
+            maxTeamSize: { type: "integer", example: 3 },
+            judges: { type: "string", example: "Dr. Jean" },
           }
         },
       },
@@ -254,7 +288,18 @@ function createSwaggerSpec(port) {
             required: true,
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/ArticleRequest" }
+                schema: {
+                  type: "object",
+                  required: ["title", "category", "author", "content"],
+                  properties: {
+                    title: { type: "string", example: "How to Write an Essay" },
+                    category: { type: "string", example: "Writing" },
+                    author: { type: "string", example: "Learning Hub Team" },
+                    status: { type: "string", enum: ["draft", "published"], example: "published" },
+                    content: { type: "string", example: "<p>HTML content here</p>" },
+                    image: { type: "string", example: "https://example.com/image.jpg" }
+                  }
+                }
               }
             }
           },
@@ -297,7 +342,17 @@ function createSwaggerSpec(port) {
             required: true,
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/ArticleRequest" }
+                schema: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", example: "How to Write an Essay" },
+                    category: { type: "string", example: "Writing" },
+                    author: { type: "string", example: "Learning Hub Team" },
+                    status: { type: "string", enum: ["draft", "published"], example: "published" },
+                    content: { type: "string", example: "<p>HTML content here</p>" },
+                    image: { type: "string", example: "https://example.com/image.jpg" }
+                  }
+                }
               }
             }
           },
@@ -372,7 +427,16 @@ function createSwaggerSpec(port) {
             required: true,
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/ActivityRequest" }
+                schema: {
+                  type: "object",
+                  required: ["title", "description"],
+                  properties: {
+                    title: { type: "string", example: "Debate Competitions" },
+                    description: { type: "string", example: "Participate in structured debates on diverse topics..." },
+                    status: { type: "string", enum: ["active", "inactive"], example: "active" },
+                    image: { type: "string", example: "https://unsplash.com/photo" },
+                  }
+                }
               }
             }
           },
@@ -406,7 +470,15 @@ function createSwaggerSpec(port) {
             required: true,
             content: {
               "application/json": {
-                schema: { $ref: "#/components/schemas/ActivityRequest" }
+                schema: {
+                  type: "object",
+                  properties: {
+                    title: { type: "string", example: "Debate Competitions" },
+                    description: { type: "string", example: "Participate in structured debates on diverse topics..." },
+                    status: { type: "string", enum: ["active", "inactive"], example: "active" },
+                    image: { type: "string", example: "https://unsplash.com/photo" },
+                  }
+                }
               }
             }
           },
@@ -437,6 +509,70 @@ function createSwaggerSpec(port) {
         }
       }
     },
+    "/api/debates": {
+      get: {
+        tags: ["Debates"],
+        summary: "Get all debates",
+        responses: {
+          200: {
+            description: "A list of debates",
+            content: {
+              "application/json": {
+                schema: { type: "array", items: { $ref: "#/components/schemas/Debate" } }
+              }
+            }
+          }
+        }
+      },
+      post: {
+        tags: ["Debates"],
+        summary: "Create a new debate (Admin only)",
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/DebateRequest" } } }
+        },
+        responses: {
+          201: { description: "Debate created", content: { "application/json": { schema: { $ref: "#/components/schemas/Debate" } } } },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" }
+        }
+      }
+    },
+    "/api/debates/{id}": {
+      put: {
+        tags: ["Debates"],
+        summary: "Update a debate (Admin only)",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "integer", description: "ID of the debate to update" } }
+        ],
+        requestBody: {
+          required: true,
+          content: { "application/json": { schema: { $ref: "#/components/schemas/DebateRequest" } } }
+        },
+        responses: {
+          200: { description: "Debate updated", content: { "application/json": { schema: { $ref: "#/components/schemas/Debate" } } } },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          404: { description: "Debate not found" }
+        }
+      },
+      delete: {
+        tags: ["Debates"],
+        summary: "Delete a debate (Admin only)",
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: "id", in: "path", required: true, schema: { type: "integer", description: "ID of the debate to delete" } }
+        ],
+        responses: {
+          200: { description: "Debate deleted" },
+          401: { description: "Unauthorized" },
+          403: { description: "Forbidden" },
+          404: { description: "Debate not found" }
+        }
+      }
+    }
   };
 }
 

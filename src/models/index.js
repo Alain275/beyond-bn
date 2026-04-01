@@ -4,10 +4,12 @@ const { sequelize } = require("../config/database");
 const { User, initUserModel } = require("./User");
 const { Article, initArticleModel } = require("./Article");
 const { Activity, initActivityModel } = require("./Activity");
+const { Debate, initDebateModel } = require("./Debate");
 
 initUserModel(sequelize);
 initArticleModel(sequelize);
 initActivityModel(sequelize);
+initDebateModel(sequelize);
 
 async function ensureSeedUser({ firstName, lastName, phone, email, password, role }) {
   const existing = await User.findOne({ where: { email } });
@@ -55,5 +57,6 @@ module.exports = {
   User,
   Article,
   Activity,
+  Debate,
   initDatabase,
 };
