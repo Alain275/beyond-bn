@@ -9,6 +9,7 @@ function createSwaggerSpec(port) {
     servers: [
       {
         url: `http://localhost:${port}`,
+        url: "https://beyond-bn.onrender.com",
       },
     ],
     tags: [
