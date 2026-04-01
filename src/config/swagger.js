@@ -20,6 +20,10 @@ function createSwaggerSpec(port) {
         name: "Articles",
         description: "Article management for the learning hub",
       },
+      {
+        name: "Activities",
+        description: "Activity management for the platform",
+      },
     ],
     components: {
       securitySchemes: {
@@ -106,6 +110,29 @@ function createSwaggerSpec(port) {
             status: { type: "string", enum: ["draft", "published"], example: "published" },
             content: { type: "string", example: "<p>HTML content here</p>" },
             image: { type: "string", example: "https://example.com/image.jpg" },
+          }
+        },
+        Activity: {
+          type: "object",
+          properties: {
+            id: { type: "integer", example: 1 },
+            title: { type: "string", example: "Debate Competitions" },
+            description: { type: "string", example: "Participate in structured debates on diverse topics..." },
+            status: { type: "string", enum: ["active", "inactive"], example: "active" },
+            image: { type: "string", example: "https://unsplash.com/photo" },
+            participants: { type: "integer", example: 48 },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          }
+        },
+        ActivityRequest: {
+          type: "object",
+          required: ["title", "description"],
+          properties: {
+            title: { type: "string", example: "Debate Competitions" },
+            description: { type: "string", example: "Participate in structured debates on diverse topics..." },
+            status: { type: "string", enum: ["active", "inactive"], example: "active" },
+            image: { type: "string", example: "https://unsplash.com/photo" },
           }
         },
       },
@@ -315,6 +342,96 @@ function createSwaggerSpec(port) {
             },
             404: {
               description: "Article not found"
+            }
+          }
+        }
+      },
+      "/api/activities": {
+        get: {
+          tags: ["Activities"],
+          summary: "Get all activities",
+          responses: {
+            200: {
+              description: "List of activities",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: { $ref: "#/components/schemas/Activity" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        post: {
+          tags: ["Activities"],
+          summary: "Create a new activity (Admin only)",
+          security: [{ BearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ActivityRequest" }
+              }
+            }
+          },
+          responses: {
+            201: {
+              description: "Activity created successfully",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Activity" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/activities/{id}": {
+        patch: {
+          tags: ["Activities"],
+          summary: "Update an activity (Admin only)",
+          security: [{ BearerAuth: [] }],
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "integer" },
+              description: "ID of the activity to update"
+            }
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ActivityRequest" }
+              }
+            }
+          },
+          responses: {
+            200: {
+              description: "Activity updated successfully"
+            }
+          }
+        },
+        delete: {
+          tags: ["Activities"],
+          summary: "Delete an activity (Admin only)",
+          security: [{ BearerAuth: [] }],
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "integer" },
+              description: "ID of the activity to delete"
+            }
+          ],
+          responses: {
+            200: {
+              description: "Activity deleted successfully"
             }
           }
         }

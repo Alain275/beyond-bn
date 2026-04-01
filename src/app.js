@@ -4,6 +4,7 @@ const swaggerUi = require("swagger-ui-express");
 
 const authRoutes = require("./routes/authRoutes");
 const articleRoutes = require("./routes/articleRoutes");
+const activityRoutes = require("./routes/activityRoutes");
 const { createSwaggerSpec } = require("./config/swagger");
 
 function createApp() {
@@ -19,6 +20,7 @@ function createApp() {
 
   app.use("/api/auth", authRoutes);
   app.use("/api/articles", articleRoutes);
+  app.use("/api/activities", activityRoutes);
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(createSwaggerSpec(port)));
 
   app.use((req, res) => {

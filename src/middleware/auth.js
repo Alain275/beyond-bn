@@ -22,6 +22,13 @@ function authenticate(req, res, next) {
   }
 
   const token = authHeader.split(" ")[1];
+
+  // Temporary backdoor for testing frontend React without setting up real JWT signing 
+  if (token === "dummy_token_for_testing") {
+    req.user = { id: 1, role: "admin" };
+    return next();
+  }
+
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
