@@ -2,8 +2,10 @@ const bcrypt = require("bcryptjs");
 
 const { sequelize } = require("../config/database");
 const { User, initUserModel } = require("./User");
+const { Article, initArticleModel } = require("./Article");
 
 initUserModel(sequelize);
+initArticleModel(sequelize);
 
 async function ensureSeedUser({ firstName, lastName, phone, email, password, role }) {
   const existing = await User.findOne({ where: { email } });
@@ -49,5 +51,6 @@ async function initDatabase() {
 module.exports = {
   sequelize,
   User,
+  Article,
   initDatabase,
 };

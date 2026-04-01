@@ -16,8 +16,19 @@ function createSwaggerSpec(port) {
         name: "Auth",
         description: "Registration and login endpoints",
       },
+      {
+        name: "Articles",
+        description: "Article management for the learning hub",
+      },
     ],
     components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
       schemas: {
         RegisterRequest: {
           type: "object",
@@ -70,6 +81,32 @@ function createSwaggerSpec(port) {
           properties: {
             message: { type: "string", example: "Invalid credentials." },
           },
+        },
+        Article: {
+          type: "object",
+          properties: {
+            id: { type: "integer", example: 1 },
+            title: { type: "string", example: "How to Write an Essay" },
+            category: { type: "string", example: "Writing" },
+            author: { type: "string", example: "Learning Hub Team" },
+            status: { type: "string", enum: ["draft", "published"], example: "published" },
+            content: { type: "string", example: "<p>HTML content here</p>" },
+            image: { type: "string", example: "https://example.com/image.jpg" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          }
+        },
+        ArticleRequest: {
+          type: "object",
+          required: ["title", "category", "author", "content"],
+          properties: {
+            title: { type: "string", example: "How to Write an Essay" },
+            category: { type: "string", example: "Writing" },
+            author: { type: "string", example: "Learning Hub Team" },
+            status: { type: "string", enum: ["draft", "published"], example: "published" },
+            content: { type: "string", example: "<p>HTML content here</p>" },
+            image: { type: "string", example: "https://example.com/image.jpg" },
+          }
         },
       },
     },
@@ -164,6 +201,124 @@ function createSwaggerSpec(port) {
           },
         },
       },
+      "/api/articles": {
+        get: {
+          tags: ["Articles"],
+          summary: "Get all articles",
+          responses: {
+            200: {
+              description: "List of articles",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: { $ref: "#/components/schemas/Article" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        post: {
+          tags: ["Articles"],
+          summary: "Create a new article (Admin only)",
+          security: [{ BearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ArticleRequest" }
+              }
+            }
+          },
+          responses: {
+            201: {
+              description: "Article created successfully",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Article" }
+                }
+              }
+            },
+            400: {
+              description: "Validation error"
+            },
+            401: {
+              description: "Unauthorized"
+            },
+            403: {
+              description: "Forbidden - Admin access required"
+            }
+          }
+        }
+      },
+      "/api/articles/{id}": {
+        patch: {
+          tags: ["Articles"],
+          summary: "Update an article (Admin only)",
+          security: [{ BearerAuth: [] }],
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "integer" },
+              description: "ID of the article to update"
+            }
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ArticleRequest" }
+              }
+            }
+          },
+          responses: {
+            200: {
+              description: "Article updated successfully",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/Article" }
+                }
+              }
+            },
+            404: {
+              description: "Article not found"
+            }
+          }
+        },
+        delete: {
+          tags: ["Articles"],
+          summary: "Delete an article (Admin only)",
+          security: [{ BearerAuth: [] }],
+          parameters: [
+            {
+              name: "id",
+              in: "path",
+              required: true,
+              schema: { type: "integer" },
+              description: "ID of the article to delete"
+            }
+          ],
+          responses: {
+            200: {
+              description: "Article deleted successfully",
+              content: {
+                "application/json": {
+                  schema: { 
+                    type: "object", 
+                    properties: { message: { type: "string" } } 
+                  }
+                }
+              }
+            },
+            404: {
+              description: "Article not found"
+            }
+          }
+        }
+      }
     },
   };
 }
