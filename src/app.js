@@ -7,6 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const articleRoutes = require("./routes/articleRoutes");
 const activityRoutes = require("./routes/activityRoutes");
 const debateRoutes = require("./routes/debateRoutes");
+const { getCloudinaryConfigStatus } = require("./config/cloudinary");
 const { createSwaggerSpec } = require("./config/swagger");
 
 function createApp() {
@@ -19,6 +20,15 @@ function createApp() {
 
   app.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok" });
+  });
+
+  app.get("/health/config", (_req, res) => {
+    const cloudinary = getCloudinaryConfigStatus();
+
+    res.status(200).json({
+      status: "ok",
+      cloudinary,
+    });
   });
 
   app.use("/api/auth", authRoutes);

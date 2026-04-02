@@ -1,4 +1,25 @@
 const { Article } = require("../models");
+const { cloudinary, isCloudinaryConfigured } = require("../config/cloudinary");
+
+function uploadBufferToCloudinary(fileBuffer) {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: "beyond/articles",
+        resource_type: "image",
+      },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+
+        return resolve(result);
+      },
+    );
+
+    uploadStream.end(fileBuffer);
+  });
+}
 
 async function createArticle(req, res) {
   try {
@@ -44,11 +65,19 @@ function parseArticleId(rawId) {
 
 async function uploadArticleImage(req, res) {
   try {
+    if (!isCloudinaryConfigured()) {
+      return res.status(500).json({
+        message: "Cloudinary is not configured. Set CLOUDINARY_URL, or set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.",
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({ message: "No image file uploaded" });
     }
 
-    const imageUrl = `/uploads/articles/${req.file.filename}`;
+    const uploaded = await uploadBufferToCloudinary(req.file.buffer);
+    const imageUrl = uploaded.secure_url;
+
     return res.status(200).json({ imageUrl });
   } catch (error) {
     console.error("Error uploading article image:", error);

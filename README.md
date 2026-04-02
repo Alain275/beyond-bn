@@ -26,3 +26,34 @@ The server runs on `https://beyond-bn.onrender.com` by default.
 ## Swagger
 
 Open `https://beyond-bn.onrender.com/api-docs` after starting the server.
+
+## Cloudinary image uploads
+
+The `POST /api/articles/upload-image` endpoint now uploads directly to Cloudinary.
+
+Required environment variables:
+
+- Option 1: `CLOUDINARY_URL`
+- Option 2: set all three below
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+
+Request details:
+
+- Content type: `multipart/form-data`
+- Field name: `image`
+- Allowed types: `jpeg`, `jpg`, `png`, `gif`, `webp`
+- Max file size: `5MB`
+
+Response example:
+
+```json
+{
+	"imageUrl": "https://res.cloudinary.com/<cloud-name>/image/upload/v1710000000/beyond/articles/article-1710000000000-123456789.jpg"
+}
+```
+
+Check Cloudinary readiness (without exposing secrets):
+
+- `GET /health/config`

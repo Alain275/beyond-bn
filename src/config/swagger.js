@@ -182,6 +182,38 @@ function createSwaggerSpec(port) {
           },
         },
       },
+      "/health/config": {
+        get: {
+          summary: "Configuration health check",
+          description: "Returns non-sensitive readiness info for external dependencies.",
+          responses: {
+            200: {
+              description: "Configuration status",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      status: { type: "string", example: "ok" },
+                      cloudinary: {
+                        type: "object",
+                        properties: {
+                          configured: { type: "boolean", example: true },
+                          missing: {
+                            type: "array",
+                            items: { type: "string" },
+                            example: [],
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
       "/api/auth/register": {
         post: {
           tags: ["Auth"],
@@ -191,6 +223,15 @@ function createSwaggerSpec(port) {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/RegisterRequest" },
+                example: {
+                  firstName: "Alain",
+                  lastName: "Mukasa",
+                  phone: "+250700000000",
+                  email: "alain@example.com",
+                  password: "Secret@123",
+                  confirmPassword: "Secret@123",
+                  role: "user",
+                },
               },
             },
           },
@@ -231,6 +272,29 @@ function createSwaggerSpec(port) {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/LoginRequest" },
+                examples: {
+                  adminEmail: {
+                    summary: "Admin login with email",
+                    value: {
+                      identifier: "admin@beyond.com",
+                      password: "Admin@123",
+                    },
+                  },
+                  userEmail: {
+                    summary: "User login with email",
+                    value: {
+                      identifier: "user@beyond.com",
+                      password: "User@123",
+                    },
+                  },
+                  studentId: {
+                    summary: "Login with student ID",
+                    value: {
+                      identifier: "BTH-0001",
+                      password: "Admin@123",
+                    },
+                  },
+                },
               },
             },
           },
@@ -463,7 +527,7 @@ function createSwaggerSpec(port) {
                     properties: {
                       imageUrl: {
                         type: "string",
-                        example: "/uploads/articles/article-1710000000000-123456789.jpg"
+                        example: "https://res.cloudinary.com/demo/image/upload/v1710000000/beyond/articles/article-1710000000000-123456789.jpg"
                       }
                     }
                   }
