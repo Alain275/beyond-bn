@@ -5,15 +5,11 @@ const { User, initUserModel } = require("./User");
 const { Article, initArticleModel } = require("./Article");
 const { Activity, initActivityModel } = require("./Activity");
 const { Debate, initDebateModel } = require("./Debate");
-const { Video, initVideoModel } = require("./Video");
-const { PDF, initPDFModel } = require("./PDF");
 
 initUserModel(sequelize);
 initArticleModel(sequelize);
 initActivityModel(sequelize);
 initDebateModel(sequelize);
-initVideoModel(sequelize);
-initPDFModel(sequelize);
 
 async function ensureSeedUser({ firstName, lastName, phone, email, password, role }) {
   const existing = await User.findOne({ where: { email } });
@@ -62,7 +58,5 @@ module.exports = {
   Article,
   Activity,
   Debate,
-  Video,
-  PDF,
   initDatabase,
 };
