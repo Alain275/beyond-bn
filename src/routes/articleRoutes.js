@@ -4,10 +4,10 @@ const upload = require("../middleware/upload");
 const {
   createArticle,
   getAllArticles,
+  uploadArticleImage,
   getArticleById,
   patchArticle,
   deleteArticle,
-  uploadImage,
 } = require("../controllers/articleController");
 
 const router = express.Router();
@@ -16,11 +16,22 @@ const router = express.Router();
 router.get("/", getAllArticles);
 router.get("/:id", getArticleById);
 
-// Image upload endpoint (Admin only)
-router.post("/upload-image", authenticate, requireAdmin, upload.single("image"), uploadImage);
-
 // Admin-only routes for modifications
 router.post("/", authenticate, requireAdmin, createArticle);
+router.post(
+  "/upload-image",
+  authenticate,
+  requireAdmin,
+  (req, res, next) => {
+    upload.single("image")(req, res, (error) => {
+      if (error) {
+        return res.status(400).json({ message: error.message });
+      }
+      return next();
+    });
+  },
+  uploadArticleImage,
+);
 router.patch("/:id", authenticate, requireAdmin, patchArticle);
 router.delete("/:id", authenticate, requireAdmin, deleteArticle);
 

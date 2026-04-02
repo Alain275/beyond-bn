@@ -7,8 +7,6 @@ const authRoutes = require("./routes/authRoutes");
 const articleRoutes = require("./routes/articleRoutes");
 const activityRoutes = require("./routes/activityRoutes");
 const debateRoutes = require("./routes/debateRoutes");
-const videoRoutes = require("./routes/videoRoutes");
-const pdfRoutes = require("./routes/pdfRoutes");
 const { createSwaggerSpec } = require("./config/swagger");
 
 function createApp() {
@@ -17,8 +15,6 @@ function createApp() {
 
   app.use(cors());
   app.use(express.json());
-
-  // Serve uploaded files statically
   app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
   app.get("/health", (_req, res) => {
@@ -29,8 +25,6 @@ function createApp() {
   app.use("/api/articles", articleRoutes);
   app.use("/api/activities", activityRoutes);
   app.use("/api/debates", debateRoutes);
-  app.use("/api/videos", videoRoutes);
-  app.use("/api/pdfs", pdfRoutes);
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(createSwaggerSpec(port)));
 
   app.use((req, res) => {
